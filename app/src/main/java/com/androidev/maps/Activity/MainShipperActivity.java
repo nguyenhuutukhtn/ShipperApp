@@ -54,6 +54,7 @@ public class MainShipperActivity extends AppCompatActivity {
     private Button buttonShowOrderInfo;
     private String username;
     private String avatar;
+    private String name;
     private CircleImageView imageViewAvatar;
     private TextView textViewUsername;
     public static AdapterMainShipper adapter;
@@ -120,7 +121,7 @@ public class MainShipperActivity extends AppCompatActivity {
 
     private void setInfo() {
         //Set text and image
-        textViewUsername.setText(username);
+        textViewUsername.setText(name);
         Glide.with(MainShipperActivity.this).load(avatar).into(imageViewAvatar);
         //Show list order
         ShowListOrder();
@@ -129,6 +130,7 @@ public class MainShipperActivity extends AppCompatActivity {
     private void getDataFromReferences() {
         sharedPreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
         FragmentConfirmed.confirmed=sharedPreferences.getBoolean("Confirmed",false);
+        name=sharedPreferences.getString("Full name","Cười cl");
         shipperID=sharedPreferences.getInt("Shipper id",4);
         username=sharedPreferences.getString("username","Cười cl");
         avatar=sharedPreferences.getString("avatar","https://firebasestorage.googleapis.com/v0/b/flashfood-ce894.appspot.com/o/profile_images%2Favatar.jpg?alt=media&token=cf8ec159-e88b-4faf-95e7-0120ac9eef1a&fbclid=IwAR3-k1DGBKytFntGCR7BE9JOaIkistzvLpAds9X-gIHifRQhBNXWxXxnVXk");

@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent=new Intent(MainActivity.this,MainShipperActivity.class);
+        Intent intent=new Intent(MainActivity.this,ActivityLogin.class);
         startActivity(intent);
     }
 }

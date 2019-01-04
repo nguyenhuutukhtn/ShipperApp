@@ -3,12 +3,12 @@ package com.androidev.maps.Response;
 public class UpdateUserInfoResponse {
     private int id;
     private String name;
-    private boolean status;
+    private int status;
     private String avatar;
     private String username;
     private String phone;
 
-    public UpdateUserInfoResponse(int id, String name, boolean status, String avatar, String username, String phone) {
+    public UpdateUserInfoResponse(int id, String name, int status, String avatar, String username, String phone) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -37,11 +37,11 @@ public class UpdateUserInfoResponse {
         this.name = name;
     }
 
-    public boolean isStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

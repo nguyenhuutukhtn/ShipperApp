@@ -213,7 +213,7 @@ public class FragmentConfirmed extends Fragment {
             public void onClick(View v) {
                 Fragment fragmentMap=new FragmentMap();
                 FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.container_fragment_confirmed,fragmentMap).commit();
+                fragmentTransaction.add(R.id.container_fragment_confirmed,fragmentMap).addToBackStack("Fragment confirm").commit();
             }
         });
         buttonComplete.setOnClickListener(new View.OnClickListener() {

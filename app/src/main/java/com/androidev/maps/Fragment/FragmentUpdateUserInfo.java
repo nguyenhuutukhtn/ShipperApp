@@ -39,7 +39,7 @@ public class FragmentUpdateUserInfo extends Fragment {
     private EditText editTextUserName,editTextFullName,editTextPhoneNumber;
     private String linkAvatar,userName,fullName,phoneNumber;
     private int shipperID;
-    private Boolean status;
+    private int status;
     private SharedPreferences sharedPreferences;
 
     @Nullable
@@ -62,7 +62,7 @@ public class FragmentUpdateUserInfo extends Fragment {
         shipperID=sharedPreferences.getInt("Shipper id",3);
 
         //Default value
-        status=FragmentConfirmed.confirmed;
+        status= sharedPreferences.getInt("status",0);
     }
 
     private void handleEvent(View view) {
@@ -127,7 +127,7 @@ public class FragmentUpdateUserInfo extends Fragment {
         SharedPreferences.Editor editor=getActivity().getSharedPreferences(FragmentConfirmed.MyPREFERENCES,Context.MODE_PRIVATE).edit();
         editor.putInt("Shipper id",updateUserInfoResponse.getId());
         editor.putString("Full name",updateUserInfoResponse.getName());
-        editor.putBoolean("status",updateUserInfoResponse.isStatus());
+        editor.putInt("status",updateUserInfoResponse.getStatus());
         editor.putString("avatar",updateUserInfoResponse.getAvatar());
         editor.putString("username",updateUserInfoResponse.getUsername());
         editor.putString("Phone number",updateUserInfoResponse.getPhone());

@@ -14,11 +14,14 @@ import com.android.volley.VolleyError;
 import com.androidev.maps.ApiHelper.ApiCaller;
 import com.androidev.maps.R;
 import com.androidev.maps.Request.LoginRequest;
+import com.androidev.maps.Response.LoginResponse;
 import com.androidev.maps.Response.MessageRespone;
 import com.google.gson.Gson;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+
+import static com.androidev.maps.Fragment.FragmentConfirmed.MyPREFERENCES;
 
 public class ActivityLogin extends AppCompatActivity {
     private EditText editTextEmail,editTextPassword;
@@ -56,7 +59,17 @@ public class ActivityLogin extends AppCompatActivity {
                 caller.post(getString(R.string.API_URL) + "/sign_in", new HashMap<String, String>(), loginRequest, new ApiCaller.OnSuccess() {
                     @Override
                     public void onSucess(String response) {
-                        Toast.makeText(ActivityLogin.this,response.toString(),Toast.LENGTH_LONG).show();
+                        LoginResponse loginResponse=new LoginResponse();
+                        Gson gson=new Gson();
+                        loginResponse=gson.fromJson(response.toString(),LoginResponse.class);
+                        SharedPreferences.Editor editor=getSharedPreferences(MyPREFERENCES,MODE_PRIVATE).edit();
+                        editor.putInt("Shipper id",loginResponse.getId());
+                        editor.putString("Full name",loginResponse.getName());
+                        editor.putString("avatar",loginResponse.getAvatar());
+                        editor.putString("username",loginResponse.getUsername());
+                        editor.putString("Phone number",loginResponse.getPhone());
+                        editor.putInt("status",loginResponse.getStatus());
+                        editor.commit();
                         Intent intent=new Intent(ActivityLogin.this,MainShipperActivity.class);
                         startActivity(intent);
                     }

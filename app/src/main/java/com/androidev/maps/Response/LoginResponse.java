@@ -1,8 +1,6 @@
-package com.androidev.maps.Request;
+package com.androidev.maps.Response;
 
-import com.androidev.maps.Model.UserInfo;
-
-public class UpdateUserInfoRequest {
+public class LoginResponse {
     private int id;
     private String name;
     private int status;
@@ -10,13 +8,17 @@ public class UpdateUserInfoRequest {
     private String username;
     private String phone;
 
-    public UpdateUserInfoRequest(int id, String name, int status, String avatar, String username, String phone) {
+    public LoginResponse(int id, String name, int status, String avatar, String username, String phone) {
         this.id = id;
         this.name = name;
         this.status = status;
         this.avatar = avatar;
         this.username = username;
         this.phone = phone;
+    }
+
+    public LoginResponse() {
+
     }
 
     public int getId() {
