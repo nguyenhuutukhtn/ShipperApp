@@ -28,6 +28,7 @@ import com.androidev.maps.ApiHelper.ApiCaller;
 import com.androidev.maps.Activity.MainShipperActivity;
 import com.androidev.maps.Model.ListOrderDetailRespone;
 import com.androidev.maps.Model.OrderInfoResponse;
+import com.androidev.maps.Model.OrderMainShipper;
 import com.androidev.maps.Model.StoreInfoRespose;
 import com.androidev.maps.R;
 import com.androidev.maps.Request.ConfirmOrderRequest;
@@ -43,6 +44,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +106,7 @@ public class FragmentConfirmed extends Fragment {
     private void getDataFromSharePreferences(View view) {
         sharedPreferences=getActivity().getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
         JsonListOrderInSharedPreferences=sharedPreferences.getString("List order detail fragment confirmed",null);
-        shipperID=sharedPreferences.getInt("Shipper id",3);
+        shipperID=sharedPreferences.getInt("Shipper id",4);
         if (JsonListOrderInSharedPreferences==null)
             showListOrderDetail(view);
         else {
@@ -234,8 +236,6 @@ public class FragmentConfirmed extends Fragment {
                         editor.commit();
                         FragmentConfirmed.confirmed=false;
                         sharedPreferences=getActivity().getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
-                        MainShipperActivity.listOrder.remove(sharedPreferences.getInt("Position",0));
-                        MainShipperActivity.adapter.notifyDataSetChanged();
                         getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     }
                 }, new ApiCaller.OnError() {
@@ -280,6 +280,7 @@ public class FragmentConfirmed extends Fragment {
                         editor.remove("Confirmed");
                         FragmentConfirmed.confirmed=false;
                         editor.commit();
+                        //getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
                         refreshListOrder();
                         /*for (int i =0 ; i<MainShipperActivity.listOrder.size();i++)
                         {
@@ -325,7 +326,13 @@ public class FragmentConfirmed extends Fragment {
                 ListOrderRespone listOrderRespone=new ListOrderRespone();
                 Gson gson=new Gson();
                 listOrderRespone=gson.fromJson(response,ListOrderRespone.class);
-                MainShipperActivity.listOrder=listOrderRespone.getFree_orders();
+                ArrayList<OrderMainShipper> list;
+                list=listOrderRespone.getFree_orders();
+                MainShipperActivity.listOrder.clear();
+                for(int i=0;i<list.size();i++)
+                {
+                    MainShipperActivity.listOrder.add(list.get(i));
+                }
                 MainShipperActivity.adapter.notifyDataSetChanged();
                 getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 /*for (int i=0;i<MainShipperActivity.listOrder.size();i++){
@@ -376,7 +383,6 @@ public class FragmentConfirmed extends Fragment {
                 textViewTotal.setText("Tổng tiền: "+orderInfoResponse.getSum_price().toString()+"đ");
                 textViewCustomerPhoneNumber.setText(orderInfoResponse.getPhone().toString());
                 setStorePhoneNumber(view,orderInfoResponse.getStore_id());
-
             }
         }, new ApiCaller.OnError() {
             @Override
@@ -442,7 +448,8 @@ public class FragmentConfirmed extends Fragment {
     private void setDistanceAndDuration(View view) throws IOException {
         originPoint=getPointFromAddress(getContext(),storeAddress);
         destinationPoint=getPointFromAddress(getContext(),customerAddress);
-
+        if(originPoint != null && destinationPoint != null)
+        {
         com.mapbox.api.directions.v5.MapboxDirections client;
 
         client= com.mapbox.api.directions.v5.MapboxDirections.builder()
@@ -489,6 +496,7 @@ public class FragmentConfirmed extends Fragment {
                 Toast.makeText(getContext(), t.toString(), Toast.LENGTH_SHORT).show();
             }
         });
+        }
     }
     public com.mapbox.geojson.Point getPointFromAddress(Context context, String strAddress) throws IOException {
         Geocoder coder = new Geocoder(context);

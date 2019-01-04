@@ -24,7 +24,9 @@ import com.androidev.maps.Adapter.AdapterOrderDetail;
 import com.androidev.maps.ApiHelper.ApiCaller;
 import com.androidev.maps.Activity.MainShipperActivity;
 import com.androidev.maps.Model.ListOrderDetailRespone;
+import com.androidev.maps.Model.Order;
 import com.androidev.maps.Model.OrderInfoResponse;
+import com.androidev.maps.Model.OrderMainShipper;
 import com.androidev.maps.R;
 import com.androidev.maps.Request.UpdateOrderRequest;
 import com.androidev.maps.Response.MessageRespone;
@@ -37,6 +39,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,52 +185,55 @@ public class FragmentOrderDetail extends Fragment {
         originPoint=getPointFromAddress(getContext(),storeAddress);
         destinationPoint=getPointFromAddress(getContext(),customerAddress);
 
-        com.mapbox.api.directions.v5.MapboxDirections client;
+        if(originPoint != null && destinationPoint !=null) {
+            com.mapbox.api.directions.v5.MapboxDirections client;
 
-        client= com.mapbox.api.directions.v5.MapboxDirections.builder()
-                .origin(originPoint)
-                .destination(destinationPoint)
-                .overview(com.mapbox.api.directions.v5.DirectionsCriteria.OVERVIEW_FULL)
-                .profile(com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_DRIVING)
-                .accessToken(getContext().getResources().getString(R.string.access_token))
-                .build();
+            client = com.mapbox.api.directions.v5.MapboxDirections.builder()
+                    .origin(originPoint)
+                    .destination(destinationPoint)
+                    .overview(com.mapbox.api.directions.v5.DirectionsCriteria.OVERVIEW_FULL)
+                    .profile(com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_DRIVING)
+                    .accessToken(getContext().getResources().getString(R.string.access_token))
+                    .build();
 
-        client.enqueueCall(new Callback<DirectionsResponse>() {
-            @Override
-            public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
-                System.out.println(call.request().url().toString());
+            client.enqueueCall(new Callback<DirectionsResponse>() {
+                @Override
+                public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                    System.out.println(call.request().url().toString());
 
-                // You can get the generic HTTP info about the response
-                Timber.d("Response code: " + response.code());
-                if (response.body() == null) {
-                    Timber.e("No routes found, make sure you set the right user and access token.");
-                    return;
-                } else if (response.body().routes().size() < 1) {
-                    Timber.e("No routes found");
-                    return;
+                    // You can get the generic HTTP info about the response
+                    Timber.d("Response code: " + response.code());
+                    if (response.body() == null) {
+                        Timber.e("No routes found, make sure you set the right user and access token.");
+                        return;
+                    } else if (response.body().routes().size() < 1) {
+                        Timber.e("No routes found");
+                        return;
+                    }
+
+                    // Get the directions route
+                    currentRoute = response.body().routes().get(0);
+                    distance = currentRoute.distance();
+                    duration = currentRoute.duration();
+                    textViewDistance.setText(new DecimalFormat("#.#").format(distance / 1000) + "km");
+                    setTextViewDuration(view);
+                    textViewShipFee.setText("$ Phí ship:" + (Math.round(distance * 6)) + "đ");
                 }
 
-                // Get the directions route
-                currentRoute = response.body().routes().get(0);
-                distance=currentRoute.distance();
-                duration=currentRoute.duration();
-                textViewDistance.setText(new DecimalFormat("#.#").format(distance/1000)+ "km");
-                setTextViewDuration(view);
-                textViewShipFee.setText("$ Phí ship:"+(Math.round(distance*6))+"đ");
-            }
-            private void setTextViewDuration(View view) {
-                if (duration<=60&&duration>0){
-                    textViewDuration.setText("1 phút");
-                } else {
-                    textViewDuration.setText(new DecimalFormat("#.#").format(duration/60)+"phút");
+                private void setTextViewDuration(View view) {
+                    if (duration <= 60 && duration > 0) {
+                        textViewDuration.setText("1 phút");
+                    } else {
+                        textViewDuration.setText(new DecimalFormat("#.#").format(duration / 60) + "phút");
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<DirectionsResponse> call, Throwable t) {
-                Toast.makeText(getContext(), t.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<DirectionsResponse> call, Throwable t) {
+                    Toast.makeText(getContext(), t.toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
     public com.mapbox.geojson.Point getPointFromAddress(Context context, String strAddress) throws IOException {
         Geocoder coder = new Geocoder(context);
@@ -256,9 +262,9 @@ public class FragmentOrderDetail extends Fragment {
                 bundle.putString("Customer address",getArguments().get("Customer address").toString());
                 bundle.putInt("Order postion",getArguments().getInt("Order position"));
                 bundle.putInt("Shipper id",shipperID);
-                MainShipperActivity.positionChose=getArguments().getInt("Order positon");
-
-
+                MainShipperActivity.positionChose=getArguments().getInt("Order position");
+//                MainShipperActivity.listOrder.remove(getArguments().getInt("Order position"));
+//                MainShipperActivity.adapter.notifyDataSetChanged();
                 fragmentConfirmed.setArguments(bundle);
                 sendUpdateToServer(view,fragmentConfirmed,getArguments().getInt("Order id"),getArguments().getInt("Shipper id"));
             }
@@ -282,6 +288,11 @@ public class FragmentOrderDetail extends Fragment {
                 Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();
                 FragmentConfirmed.confirmed=true;
                 FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
+                //ArrayList<OrderMainShipper> list = new ArrayList<>();
+                //list.add(new OrderMainShipper( 500,"","","",""));
+                //MainShipperActivity.listOrder=list;
+                MainShipperActivity.listOrder.remove(getArguments().getInt("Order position"));
+                MainShipperActivity.adapter.notifyDataSetChanged();
                 fragmentTransaction.add(R.id.container_fragment_order_detail,fragmentConfirmed).addToBackStack("Fragment order detail").commit();
             }
         }, new ApiCaller.OnError() {

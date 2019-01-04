@@ -85,7 +85,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center|left"
                                 android:paddingLeft="5dp"
-                                android:text="1 min"
+                                android:text="0 min"
                                 android:id="@+id/txt_duration_fragment_confirmed"
                                 android:textColor="#ffffff"
                                 android:textSize="16sp" />
@@ -115,7 +115,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center|left"
                                 android:paddingLeft="5dp"
-                                android:text="0.2 km"
+                                android:text="0.0 km"
                                 android:textColor="#ffffff"
                                 android:textSize="16sp"
                                 android:id="@+id/txt_distance_fragment_confirmed"/>

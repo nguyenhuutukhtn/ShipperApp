@@ -2,7 +2,7 @@
 <LinearLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
+    android:layout_marginTop="1dp"
     android:weightSum="3"
     android:background="#ffffff"
     android:orientation="vertical"
@@ -71,7 +71,7 @@
                     android:layout_weight="13"
                     android:adjustViewBounds="true"
                     android:cropToPadding="true"
-                    android:padding="15dp"
+                    android:padding="3dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/placeholder" />
                 <TextView
@@ -104,7 +104,7 @@
                     android:layout_weight="13"
                     android:src="@drawable/placeholder_red"
                     android:scaleType="fitCenter"
-                    android:padding="16dp"
+                    android:padding="3dp"
                     android:adjustViewBounds="true"
                     android:cropToPadding="true"/>
                 <TextView
