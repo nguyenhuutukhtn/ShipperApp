@@ -36,12 +36,13 @@
                 android:text="Toolbar"
                 android:textStyle="bold"/>
             <ImageView
-                android:id="@+id/refresh_icon"
+                android:id="@+id/ic_refresh"
                 android:layout_width="50dp"
                 android:layout_height="?attr/actionBarSize"
-                android:src="@drawable/refresh_arrow"
-                android:padding="13dp"
-                android:layout_alignParentEnd="true"/>
+                android:src="@drawable/ic_refresh"
+                android:padding="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
 
         </RelativeLayout>
 
