@@ -64,7 +64,7 @@ public class ApiCaller {
                 if (error instanceof NetworkError) {
                     Toast.makeText(context, "Oops. Network error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ServerError) {
-                    Toast.makeText(context, "Oops. Server error!", Toast.LENGTH_LONG).show();
+
                 } else if (error instanceof AuthFailureError) {
                     Toast.makeText(context, "Oops. Auth Failure error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ParseError) {
@@ -120,7 +120,7 @@ public class ApiCaller {
                 if (error instanceof NetworkError) {
                     Toast.makeText(context, "Oops. Network error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ServerError) {
-                    Toast.makeText(context, "Oops. Server error!", Toast.LENGTH_LONG).show();
+
                 } else if (error instanceof AuthFailureError) {
                     Toast.makeText(context, "Oops. Auth Failure error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ParseError) {
@@ -186,7 +186,7 @@ public class ApiCaller {
                 if (error instanceof NetworkError) {
                     Toast.makeText(context, "Oops. Network error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ServerError) {
-                    Toast.makeText(context, "Oops. Server error!", Toast.LENGTH_LONG).show();
+
                 } else if (error instanceof AuthFailureError) {
                     Toast.makeText(context, "Oops. Auth Failure error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ParseError) {
@@ -252,7 +252,7 @@ public class ApiCaller {
                 if (error instanceof NetworkError) {
                     Toast.makeText(context, "Oops. Network error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ServerError) {
-                    Toast.makeText(context, "Oops. Server error!", Toast.LENGTH_LONG).show();
+
                 } else if (error instanceof AuthFailureError) {
                     Toast.makeText(context, "Oops. Auth Failure error!", Toast.LENGTH_LONG).show();
                 } else if (error instanceof ParseError) {
