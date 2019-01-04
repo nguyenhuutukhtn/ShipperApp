@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Address</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">Name</string>
+    <string name="setting">Setting</string>
+    <string name="information_update">Information update</string>
+    <string name="log_out">Log out</string>
+    <!--<string name="default_avatar">https://firebasestorage.googleapis.com/v0/b/flashfood-ce894.appspot.com/o/profile_images%2Favatar.jpg?alt=media&token=cf8ec159-e88b-4faf-95e7-0120ac9eef1a&fbclid=IwAR1_eSK2EfgpPbfYs3I7H0gv5RycRp6EHyAz24IAdnA_G9RtDgHxCUmGKrQ</string>-->
+    <string name="API_KEY">AIzaSyBd3YD3VWh5-ohG6M-fHsGChAM-0XcDdL4</string>
+    <string name="access_token">pk.eyJ1Ijoibmd1eWVuaHV1dHVraHRuIiwiYSI6ImNqcHZqenViOTA5dHE0OWxjcmhvNmdva2cifQ.d8Lxjsw7tAdoFyjvPTXqHQ</string>
+    <string name="API_URL">http://192.168.1.73:7020</string>
+</resources>

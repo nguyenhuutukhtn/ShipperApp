@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:clickable="true"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <LinearLayout android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:clickable="true"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:weightSum="100"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <include layout="@layout/header"></include>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="90"
+            android:orientation="vertical">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+
+                    <!--<TextView-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginStart="5dp"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:gravity="left|center"-->
+                    <!--android:paddingLeft="5dp"-->
+                    <!--android:text="Ngày đặt hàng: "-->
+                    <!--android:textColor="#1e1e1d"-->
+                    <!--android:textSize="17sp" />-->
+
+                    <!--<TextView-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:layout_marginRight="15dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:gravity="center|right"-->
+                    <!--android:text="12-12-2018"-->
+                    <!--android:textColor="#d70016"-->
+                    <!--android:textSize="17sp" />-->
+                    <!--</LinearLayout>-->
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="#e9e9d4">
+
+                        <LinearLayout
+                            android:id="@+id/layout_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/rounded_corner_fragment_order_detail"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:adjustViewBounds="true"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/alarm_clock" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:gravity="center|left"
+                                android:paddingLeft="5dp"
+                                android:text="1 min"
+                                android:id="@+id/txt_duration_fragment_order_detail"
+                                android:textColor="#ffffff"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layout_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_toEndOf="@+id/layout_time"
+                            android:background="@drawable/rounded_corner_fragment_order_detail"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:adjustViewBounds="true"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/navigation" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:gravity="center|left"
+                                android:paddingLeft="5dp"
+                                android:text="0.2 km"
+                                android:id="@+id/txt_distance_fragment_order_detail"
+                                android:textColor="#ffffff"
+                                android:textSize="16sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layout_ship_price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_toEndOf="@+id/layout_distance"
+                            android:background="@drawable/rounded_corner_fragment_order_detail"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:adjustViewBounds="true"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/price_tag" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:gravity="center|left"
+                                android:paddingLeft="5dp"
+                                android:text="Tổng tiền: 150000đ"
+                                android:id="@+id/txt_total_fragment_order_detail"
+                                android:textColor="#ffffff"
+                                android:textSize="16sp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/layout_time"
+                            android:layout_alignParentStart="true"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:paddingLeft="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:paddingRight="5dp"
+                            android:text="$ Phí ship: 10000đ"
+                            android:id="@+id/txt_ship_fee_fragment_order_detail"
+                            android:layout_marginBottom="10dp"
+                            android:background="@drawable/rounded_corner_fragment_order_detail"
+                            android:textColor="#ffffff"
+                            android:textSize="16sp"/>
+                    </RelativeLayout>
+
+
+
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+
+
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="#ffffff"
+                            android:gravity="center"
+                            android:paddingLeft="5dp"
+                            android:text="DANH SÁCH MÓN ĂN"
+                            android:textColor="#2b2b2b"
+                            android:textSize="18sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <android.support.v7.widget.RecyclerView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/rcv_order_detail">
+
+                            </android.support.v7.widget.RecyclerView>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:id="@+id/btn_confirm_fragment_order_detail"
+            android:background="@drawable/rounded_corner_fragment_order_detail"
+            android:text="Nhận giao hàng"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"/>
+
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container_fragment_order_detail">
+    </FrameLayout>
+</RelativeLayout>
