@@ -129,7 +129,7 @@ public class MainShipperActivity extends AppCompatActivity {
     private void getDataFromReferences() {
         sharedPreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
         FragmentConfirmed.confirmed=sharedPreferences.getBoolean("Confirmed",false);
-        shipperID=sharedPreferences.getInt("Shipper id",3);
+        shipperID=sharedPreferences.getInt("Shipper id",4);
         username=sharedPreferences.getString("username","Cười cl");
         avatar=sharedPreferences.getString("avatar","https://firebasestorage.googleapis.com/v0/b/flashfood-ce894.appspot.com/o/profile_images%2Favatar.jpg?alt=media&token=cf8ec159-e88b-4faf-95e7-0120ac9eef1a&fbclid=IwAR3-k1DGBKytFntGCR7BE9JOaIkistzvLpAds9X-gIHifRQhBNXWxXxnVXk");
     }
@@ -176,12 +176,14 @@ public class MainShipperActivity extends AppCompatActivity {
         });
     }
 
-    private void sendUpdateToServer(Integer order_id, int shipper_id) {
+    private void sendUpdateToServer(Integer order_id, int shipper_id,int position) {
         ApiCaller caller=new ApiCaller(MainShipperActivity.this);
         UpdateOrderRequest updateOrderRequest=new UpdateOrderRequest(order_id,shipper_id);
         caller.put(getString(R.string.API_URL)+"/pick_order", new HashMap<String, String>(), updateOrderRequest, new ApiCaller.OnSuccess() {
             @Override
             public void onSucess(String response) {
+                MainShipperActivity.listOrder.remove(position);
+                MainShipperActivity.adapter.notifyDataSetChanged();
                 Toast.makeText(MainShipperActivity.this, response.toString(), Toast.LENGTH_LONG).show();
             }
         }, new ApiCaller.OnError() {
@@ -276,7 +278,7 @@ public class MainShipperActivity extends AppCompatActivity {
                     editor.commit();
                     fragmentConfirmed.setArguments(bundle);
 
-                    sendUpdateToServer(listOrder.get(position).getOrder_id(), shipperID);
+                    sendUpdateToServer(listOrder.get(position).getOrder_id(), shipperID,position);
                     fragmentTransaction.add(R.id.drawer_layout, fragmentConfirmed).addToBackStack("Main activity").commit();
                 }
             }
@@ -312,6 +314,46 @@ public class MainShipperActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
 
+    }
+    private void refreshListOrder() {
+        ApiCaller caller=new ApiCaller(MainShipperActivity.this);
+        Map<String,String> header=new HashMap<>();
+        header.put("Content-Type", "application/json");
+        caller.get(getString(R.string.API_URL)+"/order/all", new HashMap<String, String>(), new ApiCaller.OnSuccess() {
+            @Override
+            public void onSucess(String response) {
+
+                ListOrderRespone listOrderRespone=new ListOrderRespone();
+                Gson gson=new Gson();
+                listOrderRespone=gson.fromJson(response,ListOrderRespone.class);
+                MainShipperActivity.listOrder=listOrderRespone.getFree_orders();
+                MainShipperActivity.adapter.notifyDataSetChanged();
+                /*for (int i=0;i<MainShipperActivity.listOrder.size();i++){
+                    Toast.makeText(getContext(),MainShipperActivity.listOrder.get(i).getOrder_id()+"",Toast.LENGTH_SHORT).show();
+                }*/
+
+            }
+        }, new ApiCaller.OnError() {
+            @Override
+            public void onError(VolleyError error) {
+                if (error == null || error.networkResponse == null) {
+                    return;
+                }
+
+                String body;
+                //get status code here
+                final String statusCode = String.valueOf(error.networkResponse.statusCode);
+                //get response body and parse with appropriate encoding
+                try {
+                    body = new String(error.networkResponse.data,"UTF-8");
+                    Gson gson=new Gson();
+                    MessageRespone messageRespone=gson.fromJson(body,MessageRespone.class);
+                    Toast.makeText(MainShipperActivity.this,messageRespone.getMessage(),Toast.LENGTH_LONG).show();
+                } catch (UnsupportedEncodingException e) {
+                    // exception
+                }
+            }
+        });
     }
 
 }
