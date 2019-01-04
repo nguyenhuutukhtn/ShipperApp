@@ -135,6 +135,7 @@ public class FragmentOrderDetail extends Fragment {
     private void getDataFromPreviousView(View view) {
         storeAddress=getArguments().get("Store address").toString();
         customerAddress=getArguments().get("Customer address").toString();
+        shipperID=getArguments().getInt("Shipper id");
     }
 
     private void setContent(View view) throws IOException {

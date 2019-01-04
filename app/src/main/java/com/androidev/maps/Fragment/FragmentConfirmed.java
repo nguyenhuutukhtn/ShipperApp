@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.androidev.maps.Adapter.AdapterMainShipper;
 import com.androidev.maps.Adapter.AdapterOrderDetail;
 import com.androidev.maps.ApiHelper.ApiCaller;
 import com.androidev.maps.Activity.MainShipperActivity;
@@ -31,6 +32,7 @@ import com.androidev.maps.Model.StoreInfoRespose;
 import com.androidev.maps.R;
 import com.androidev.maps.Request.ConfirmOrderRequest;
 import com.androidev.maps.Request.RejectOrderRequest;
+import com.androidev.maps.Response.ListOrderRespone;
 import com.androidev.maps.Response.MessageRespone;
 import com.google.gson.Gson;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
@@ -102,6 +104,7 @@ public class FragmentConfirmed extends Fragment {
     private void getDataFromSharePreferences(View view) {
         sharedPreferences=getActivity().getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
         JsonListOrderInSharedPreferences=sharedPreferences.getString("List order detail fragment confirmed",null);
+        shipperID=sharedPreferences.getInt("Shipper id",3);
         if (JsonListOrderInSharedPreferences==null)
             showListOrderDetail(view);
         else {
@@ -215,7 +218,7 @@ public class FragmentConfirmed extends Fragment {
             @Override
             public void onClick(View v) {
                 ApiCaller caller=new ApiCaller(getContext());
-                ConfirmOrderRequest confirmOrderRequest=new ConfirmOrderRequest(orderID,getArguments().getInt("Shipper id"));
+                ConfirmOrderRequest confirmOrderRequest=new ConfirmOrderRequest(orderID,shipperID);
                 //Toast.makeText(getContext(),orderID+"",Toast.LENGTH_LONG).show();
                 caller.post(getResources().getString(R.string.API_URL)+"/confirm_order", new HashMap<String, String>(), confirmOrderRequest, new ApiCaller.OnSuccess() {
                     @Override
@@ -262,12 +265,12 @@ public class FragmentConfirmed extends Fragment {
             @Override
             public void onClick(View v) {
                 ApiCaller caller=new ApiCaller(getContext());
-                RejectOrderRequest rejectOrderRequest=new RejectOrderRequest(orderID,getArguments().getInt("Shipper id"));
+                RejectOrderRequest rejectOrderRequest=new RejectOrderRequest(orderID,shipperID);
                 caller.put(getResources().getString(R.string.API_URL)+"/reject_order", new HashMap<String, String>(), rejectOrderRequest, new ApiCaller.OnSuccess() {
                     @Override
                     public void onSucess(String response) {
                         //Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();
-                        getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        //getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
                         SharedPreferences.Editor editor=getActivity().getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE).edit();
                         editor.remove("Store name");
                         editor.remove("Store address");
@@ -277,7 +280,14 @@ public class FragmentConfirmed extends Fragment {
                         editor.remove("Confirmed");
                         FragmentConfirmed.confirmed=false;
                         editor.commit();
-                        getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        refreshListOrder();
+                        /*for (int i =0 ; i<MainShipperActivity.listOrder.size();i++)
+                        {
+                            Toast.makeText(getContext(),MainShipperActivity.listOrder.get(i).getOrder_id()+"",Toast.LENGTH_LONG).show();
+                        }*/
+                        //MainShipperActivity.adapter.notifyDataSetChanged();
+
+                        //refreshListOrder();
                     }
                 }, new ApiCaller.OnError() {
                     @Override
@@ -300,6 +310,48 @@ public class FragmentConfirmed extends Fragment {
                         }
                     }
                 });
+            }
+        });
+    }
+
+    private void refreshListOrder() {
+        ApiCaller caller=new ApiCaller(getContext());
+        Map<String,String> header=new HashMap<>();
+        header.put("Content-Type", "application/json");
+        caller.get(getString(R.string.API_URL)+"/order/all", new HashMap<String, String>(), new ApiCaller.OnSuccess() {
+            @Override
+            public void onSucess(String response) {
+
+                ListOrderRespone listOrderRespone=new ListOrderRespone();
+                Gson gson=new Gson();
+                listOrderRespone=gson.fromJson(response,ListOrderRespone.class);
+                MainShipperActivity.listOrder=listOrderRespone.getFree_orders();
+                MainShipperActivity.adapter.notifyDataSetChanged();
+                getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                /*for (int i=0;i<MainShipperActivity.listOrder.size();i++){
+                    Toast.makeText(getContext(),MainShipperActivity.listOrder.get(i).getOrder_id()+"",Toast.LENGTH_SHORT).show();
+                }*/
+
+            }
+        }, new ApiCaller.OnError() {
+            @Override
+            public void onError(VolleyError error) {
+                if (error == null || error.networkResponse == null) {
+                    return;
+                }
+
+                String body;
+                //get status code here
+                final String statusCode = String.valueOf(error.networkResponse.statusCode);
+                //get response body and parse with appropriate encoding
+                try {
+                    body = new String(error.networkResponse.data,"UTF-8");
+                    Gson gson=new Gson();
+                    MessageRespone messageRespone=gson.fromJson(body,MessageRespone.class);
+                    Toast.makeText(getContext(),messageRespone.getMessage(),Toast.LENGTH_LONG).show();
+                } catch (UnsupportedEncodingException e) {
+                    // exception
+                }
             }
         });
     }

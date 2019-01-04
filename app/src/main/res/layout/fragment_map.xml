@@ -4,17 +4,28 @@
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:clickable="true"
     xmlns:android="http://schemas.android.com/apk/res/android" >
-    <include layout="@layout/header"></include>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.mapbox.mapboxsdk.maps.MapView
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:id="@+id/mapView"
-            android:layout_height="match_parent"
-            mapbox:mapbox_cameraTargetLat="38.9098"
-            mapbox:mapbox_cameraTargetLng="-77.0295"
-            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
-            mapbox:mapbox_cameraZoom="12"/>
+            android:layout_height="?attr/actionBarSize">
+            <include layout="@layout/header"></include>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:layout_width="match_parent"
+                android:id="@+id/mapView"
+                android:layout_height="match_parent"
+                mapbox:mapbox_cameraTargetLat="38.9098"
+                mapbox:mapbox_cameraTargetLng="-77.0295"
+                mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
+                mapbox:mapbox_cameraZoom="12"/>
+        </LinearLayout>
     </LinearLayout>
+
 </RelativeLayout>

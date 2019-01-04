@@ -167,18 +167,8 @@ public class MainShipperActivity extends AppCompatActivity {
                     bundle.putString("Customer address", listOrder.get(position).getTo());
                     bundle.putInt("Shipper id",shipperID);
                     bundle.putInt("Order position",position);
-//                    SharedPreferences.Editor editor=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE).edit();
-//                    editor.putString("Store name", listOrder.get(position).getStore_name());
-//                    editor.putString("Store address",listOrder.get(position).getFrom());
-//                    editor.putString("Customer name",listOrder.get(position).getCustomer_name());
-//                    editor.putString("Customer address",listOrder.get(position).getTo());
-//                    editor.putInt("Order id",listOrder.get(position).getOrder_id());
-//                    editor.putInt("Postion",position);
-//                    editor.commit();
+
                     fragmentOrderDetail.setArguments(bundle);
-/*                    listOrder.remove(position);
-                    adapter.notifyDataSetChanged();*/
-                    //sendUpdateToServer(listOrder.get(position).getOrder_id(),2);
                     fragmentTransaction.add(R.id.drawer_layout, fragmentOrderDetail).addToBackStack("Main activity").commit();
 
                 }
@@ -232,29 +222,25 @@ public class MainShipperActivity extends AppCompatActivity {
                 rcvOrder.setAdapter(adapter);
                 setEventOrderList(adapter);
                 setOnConfirmButtonClick(adapter);
-                //Toast.makeText(MainShipperActivity.this,listOrder.get(0).getTo(),Toast.LENGTH_LONG).show();
-                /*AdapterOrderDetail adapter=new AdapterOrderDetail(listOrder,R.layout.item_main_shipper,MainShipperActivity.this);
-                lvOrder.setAdapter(adapter);*/
             }
         }, new ApiCaller.OnError() {
             @Override
             public void onError(VolleyError error) {
-                if (error != null) {
-                    if (error == null || error.networkResponse == null) {
-                        return;
-                    }
+                if (error == null || error.networkResponse == null) {
+                    return;
+                }
 
-                    String body = null;
-                    //get status code here
-                    final String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    //get response body and parse with appropriate encoding
-                    try {
-                        body = new String(error.networkResponse.data,"UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        // exception
-                    }
-
-                    Toast.makeText(MainShipperActivity.this,body,Toast.LENGTH_LONG).show();
+                String body;
+                //get status code here
+                final String statusCode = String.valueOf(error.networkResponse.statusCode);
+                //get response body and parse with appropriate encoding
+                try {
+                    body = new String(error.networkResponse.data,"UTF-8");
+                    Gson gson=new Gson();
+                    MessageRespone messageRespone=gson.fromJson(body,MessageRespone.class);
+                    Toast.makeText(MainShipperActivity.this,messageRespone.getMessage(),Toast.LENGTH_LONG).show();
+                } catch (UnsupportedEncodingException e) {
+                    // exception
                 }
             }
         });
