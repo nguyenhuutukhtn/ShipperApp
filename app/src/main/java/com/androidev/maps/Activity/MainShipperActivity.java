@@ -178,15 +178,17 @@ public class MainShipperActivity extends AppCompatActivity {
         });
     }
 
-    private void sendUpdateToServer(Integer order_id, int shipper_id,int position) {
+    private void sendUpdateToServer(Fragment fragmentConfirmed, Integer order_id, int shipper_id,int position) {
         ApiCaller caller=new ApiCaller(MainShipperActivity.this);
         UpdateOrderRequest updateOrderRequest=new UpdateOrderRequest(order_id,shipper_id);
         caller.put(getString(R.string.API_URL)+"/pick_order", new HashMap<String, String>(), updateOrderRequest, new ApiCaller.OnSuccess() {
             @Override
             public void onSucess(String response) {
+                FragmentConfirmed.confirmed = true;
                 MainShipperActivity.listOrder.remove(position);
                 MainShipperActivity.adapter.notifyDataSetChanged();
-                Toast.makeText(MainShipperActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.drawer_layout, fragmentConfirmed).addToBackStack("Main activity").commit();
             }
         }, new ApiCaller.OnError() {
             @Override
@@ -258,9 +260,7 @@ public class MainShipperActivity extends AppCompatActivity {
                 if (FragmentConfirmed.confirmed==true){
                     Toast.makeText(MainShipperActivity.this,"Bạn chưa giao xong đơn hàng trước",Toast.LENGTH_LONG).show();
                 } else {
-                    FragmentConfirmed.confirmed = true;
                     Fragment fragmentConfirmed = new FragmentConfirmed();
-                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     Bundle bundle = new Bundle();
                     bundle.putInt("Order id", listOrder.get(position).getOrder_id());
                     bundle.putString("Store name", listOrder.get(position).getStore_name());
@@ -280,8 +280,8 @@ public class MainShipperActivity extends AppCompatActivity {
                     editor.commit();
                     fragmentConfirmed.setArguments(bundle);
 
-                    sendUpdateToServer(listOrder.get(position).getOrder_id(), shipperID,position);
-                    fragmentTransaction.add(R.id.drawer_layout, fragmentConfirmed).addToBackStack("Main activity").commit();
+                    sendUpdateToServer(fragmentConfirmed,listOrder.get(position).getOrder_id(), shipperID,position);
+
                 }
             }
         });

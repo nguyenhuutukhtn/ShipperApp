@@ -315,6 +315,7 @@ public class FragmentOrderDetail extends Fragment {
                 } catch (UnsupportedEncodingException e) {
                     // exception
                 }
+                getFragmentManager().popBackStack();
             }
         });
 

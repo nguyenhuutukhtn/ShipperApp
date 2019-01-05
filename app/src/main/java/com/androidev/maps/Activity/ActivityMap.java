@@ -460,6 +460,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
+        mMap.clear();
         currentLocation=location;
         currentPoint = Point.fromLngLat(currentLocation.getLongitude(), currentLocation.getLatitude());
         currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
