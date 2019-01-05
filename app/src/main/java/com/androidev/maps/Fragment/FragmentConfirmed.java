@@ -329,10 +329,11 @@ public class FragmentConfirmed extends Fragment {
                 listOrderRespone=gson.fromJson(response,ListOrderRespone.class);
                 ArrayList<OrderMainShipper> list;
                 list=listOrderRespone.getFree_orders();
-                MainShipperActivity.listOrder.clear();
-                for(int i=0;i<list.size();i++)
-                {
-                    MainShipperActivity.listOrder.add(list.get(i));
+                if(MainShipperActivity.listOrder != null) {
+                    MainShipperActivity.listOrder.clear();
+                    for (int i = 0; i < list.size(); i++) {
+                        MainShipperActivity.listOrder.add(list.get(i));
+                    }
                 }
                 MainShipperActivity.adapter.notifyDataSetChanged();
                 getFragmentManager().popBackStack("Main activity",FragmentManager.POP_BACK_STACK_INCLUSIVE);

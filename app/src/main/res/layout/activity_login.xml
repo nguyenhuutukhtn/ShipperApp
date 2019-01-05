@@ -13,6 +13,7 @@
         android:paddingRight="24dp">
 
         <ImageView android:src="@drawable/shipper_logo"
+            android:background="#00000000"
             android:layout_width="wrap_content"
             android:layout_height="72dp"
             android:layout_marginBottom="24dp"
@@ -48,18 +49,14 @@
             android:id="@+id/btn_login_activity_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:textColor="#ffffff"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
+            android:background="@drawable/rounded_corner_main_shipper"
             android:text="Login"/>
 
-        <TextView android:id="@+id/link_signup"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="No account yet? Create one"
-            android:gravity="center"
-            android:textSize="16dip"/>
+
 
     </LinearLayout>
 </ScrollView>
