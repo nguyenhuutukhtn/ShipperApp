@@ -26,8 +26,11 @@ import android.widget.Toast;
 
 import com.androidev.maps.R;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.api.optimization.v1.MapboxOptimization;
@@ -82,6 +85,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private ImageButton buttonShowDirection;
     private ImageButton buttonBack;
     private ImageButton buttonGPS;
+    private FusedLocationProviderClient mFusedLocationClient;
     LocationManager locationManager;
     private static final String FIRST = "first";
     private static final String ANY = "any";
@@ -96,6 +100,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         mapping();
         setData();
         // Setup the MapView
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     }
@@ -103,7 +108,6 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         mMap = mapboxMap;
-        Toast.makeText(ActivityMap.this,"xx",Toast.LENGTH_LONG).show();
         showCurrentLocation(mMap);
         handleSearchEvent();
         handleButtonShowDirectionClickEvent(mMap);
@@ -134,14 +138,11 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == RequestCode)
-        {
-            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
-            {
+        if (requestCode == RequestCode) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showCurrentLocation(mMap);
-            }
-            else {
-                Toast.makeText(ActivityMap.this,"không thể định vị vị trí khi không câp quyền",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(ActivityMap.this, "không thể định vị vị trí khi không câp quyền", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -155,11 +156,10 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
                     imageViewSatillineMap.setImageResource(R.drawable.normal_map);
                     mapStyle = "SATELLINE";
                 } else {
-                    mMap.setStyle(Style.MAPBOX_STREETS);
+                    mMap.setStyleUrl(Style.MAPBOX_STREETS);
                     imageViewSatillineMap.setImageResource(R.drawable.satelline_map);
                     mapStyle = "NORMAL";
                 }
-                mMap.setStyleUrl(Style.SATELLITE);
             }
         });
     }
@@ -331,29 +331,24 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void showCurrentLocation(MapboxMap mMap) {
-        if (currentLocation!=null){
-            currentPoint = Point.fromLngLat(currentLocation.getLongitude(), currentLocation.getLatitude());
-            currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            //add marker
-            Icon icon = IconFactory.getInstance(ActivityMap.this).fromResource(R.drawable.scooter_front_view);
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
-                    .title("Bạn đang ở đây"))
-                    .setIcon(icon);
-
-            CameraPosition position = new CameraPosition.Builder()
-                    .target(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())) // Sets the new camera position
-                    .zoom(12) // Sets the zoom
-                    .tilt(20) // Set the camera tilt
-                    .build(); // Creates a CameraPosition from the builder
-            mMap.animateCamera(CameraUpdateFactory
-                    .newCameraPosition(position), 1500);
-            return;
-        }
 
         try {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+            // Creating a criteria object to retrieve provider
+            if(ActivityCompat.checkSelfPermission(ActivityMap.this,ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED) {
+                Criteria criteria = new Criteria();
+
+                // Getting the name of the best provider
+                String provider = locationManager.getBestProvider(criteria, true);
+
+                // Getting Current Location
+                Location location = locationManager.getLastKnownLocation(provider);
+
+                if (location != null) {
+                    onLocationChanged(location);
+                }
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+            }
         }
         catch(SecurityException e) {
             e.printStackTrace();
@@ -424,11 +419,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(ActivityMap.this,"abcdđ",Toast.LENGTH_LONG).show();
         mapView.onResume();
-        mapView.getMapAsync(this);
-        //showCurrentLocation(mMap);
-
     }
 
     @Override
