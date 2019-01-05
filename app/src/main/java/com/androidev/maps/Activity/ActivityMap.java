@@ -7,9 +7,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -56,7 +58,7 @@ import retrofit2.Response;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.mapbox.core.constants.Constants.PRECISION_6;
 
-public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback {
+public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
     private static final String TAG = "abc";
     public static final int RequestCode = 20;
     private MapView mapView;
@@ -80,6 +82,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private ImageButton buttonShowDirection;
     private ImageButton buttonBack;
     private ImageButton buttonGPS;
+    LocationManager locationManager;
     private static final String FIRST = "first";
     private static final String ANY = "any";
     private static final String TEAL_COLOR = "#23D2BE";
@@ -100,7 +103,8 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         mMap = mapboxMap;
-        //showCurrentLocation(mMap);
+        Toast.makeText(ActivityMap.this,"xx",Toast.LENGTH_LONG).show();
+        showCurrentLocation(mMap);
         handleSearchEvent();
         handleButtonShowDirectionClickEvent(mMap);
         handleSatellineImage(mMap);
@@ -108,6 +112,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         handleSatellineImage(mMap);
         handleBackButton();
     }
+
 
     private void handleGPSbutton() {
         buttonGPS.setOnClickListener(new View.OnClickListener() {
@@ -118,11 +123,26 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
             }
         });
     }
+
     private void getPermissionLocation() {
         if (ContextCompat.checkSelfPermission(ActivityMap.this,
                 ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
         } else {
-            ActivityCompat.requestPermissions(ActivityMap.this,new String []{ACCESS_FINE_LOCATION},RequestCode);
+            ActivityCompat.requestPermissions(ActivityMap.this, new String[]{ACCESS_FINE_LOCATION}, RequestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == RequestCode)
+        {
+            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+            {
+                showCurrentLocation(mMap);
+            }
+            else {
+                Toast.makeText(ActivityMap.this,"không thể định vị vị trí khi không câp quyền",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -130,15 +150,14 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         imageViewSatillineMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mapStyle.equals("NORMAL")){
+                if (mapStyle.equals("NORMAL")) {
                     mMap.setStyleUrl(Style.SATELLITE);
                     imageViewSatillineMap.setImageResource(R.drawable.normal_map);
-                    mapStyle="SATELLINE";
-                }
-                else {
+                    mapStyle = "SATELLINE";
+                } else {
                     mMap.setStyle(Style.MAPBOX_STREETS);
                     imageViewSatillineMap.setImageResource(R.drawable.satelline_map);
-                    mapStyle="NORMAL";
+                    mapStyle = "NORMAL";
                 }
                 mMap.setStyleUrl(Style.SATELLITE);
             }
@@ -150,15 +169,15 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         buttonShowDirection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (searchedLatLng==null){
-                    Toast.makeText(ActivityMap.this,"Bạn chưa chọn địa điểm",Toast.LENGTH_LONG).show();
+                if (searchedLatLng == null) {
+                    Toast.makeText(ActivityMap.this, "Bạn chưa chọn địa điểm", Toast.LENGTH_LONG).show();
                 } else {
                     Icon icon = IconFactory.getInstance(ActivityMap.this).fromResource(R.drawable.scooter_front_view);
                     mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()))
+                            .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
                             .title("Bạn đang ở đây"))
                             .setIcon(icon);
-                    DrawRouteBetween2Point(currentLatLng,searchedLatLng);
+                    DrawRouteBetween2Point(currentLatLng, searchedLatLng);
                 }
             }
         });
@@ -166,8 +185,8 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
 
     private void DrawRouteBetween2Point(LatLng origin, LatLng destination) {
         stops.clear();
-        stops.add(Point.fromLngLat(origin.getLongitude(),origin.getLatitude()));
-        stops.add(Point.fromLngLat(destination.getLongitude(),destination.getLatitude()));
+        stops.add(Point.fromLngLat(origin.getLongitude(), origin.getLatitude()));
+        stops.add(Point.fromLngLat(destination.getLongitude(), destination.getLatitude()));
         getOptimizedRoute(stops);
     }
 
@@ -251,10 +270,10 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName());
-                searchedAddress=place.getAddress().toString();
+                searchedAddress = place.getAddress().toString();
                 mMap.clear();
-                searchedLatLng=new LatLng(place.getLatLng().latitude,place.getLatLng().longitude);
-                showLocationWithPlace(place,mMap);
+                searchedLatLng = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
+                showLocationWithPlace(place, mMap);
                 showPlaceInfoOnScreen(place);
                 com.google.android.gms.maps.model.LatLng newLatLng = place.getLatLng();
             }
@@ -263,28 +282,29 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
             public void onError(Status status) {
                 // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
-                Toast.makeText(ActivityMap.this,status.getStatusMessage().toString(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(ActivityMap.this, status.getStatusMessage().toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void showPlaceInfoOnScreen(Place place) {
-        String placeinfo="";
-        if (place.getName()!=null)
-            placeinfo=placeinfo+place.getName().toString()+"\n";
-        if (place.getAddress()!=null){
-            placeinfo=placeinfo+"Địa chỉ: ";
-            placeinfo=placeinfo+place.getAddress().toString()+"\n";}
-        if (place.getPhoneNumber()!=null) {
-            placeinfo=placeinfo+"SDT: ";
-            placeinfo=placeinfo+place.getPhoneNumber().toString()+"\n";
+        String placeinfo = "";
+        if (place.getName() != null)
+            placeinfo = placeinfo + place.getName().toString() + "\n";
+        if (place.getAddress() != null) {
+            placeinfo = placeinfo + "Địa chỉ: ";
+            placeinfo = placeinfo + place.getAddress().toString() + "\n";
         }
-        if (place.getWebsiteUri()!=null){
-            placeinfo=placeinfo+"Website: ";
-            placeinfo=placeinfo+place.getWebsiteUri().toString()+"\n";
+        if (place.getPhoneNumber() != null) {
+            placeinfo = placeinfo + "SDT: ";
+            placeinfo = placeinfo + place.getPhoneNumber().toString() + "\n";
         }
-        if (place.getAttributions()!=null){
-            placeinfo=placeinfo+place.getAddress().toString()+"\n";
+        if (place.getWebsiteUri() != null) {
+            placeinfo = placeinfo + "Website: ";
+            placeinfo = placeinfo + place.getWebsiteUri().toString() + "\n";
+        }
+        if (place.getAttributions() != null) {
+            placeinfo = placeinfo + place.getAddress().toString() + "\n";
         }
         textViewPlaceInfo.setText(placeinfo);
         imageViewCloseLayoutPlaceInfo.setImageResource(R.drawable.close_button);
@@ -299,10 +319,10 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
 
     private void showLocationWithPlace(Place place, MapboxMap mMap) {
         mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(place.getLatLng().latitude,place.getLatLng().longitude))
+                .position(new LatLng(place.getLatLng().latitude, place.getLatLng().longitude))
                 .title("Vị trí cần tìm"));
         CameraPosition position = new CameraPosition.Builder()
-                .target(new LatLng(place.getLatLng().latitude,place.getLatLng().longitude)) // Sets the new camera position
+                .target(new LatLng(place.getLatLng().latitude, place.getLatLng().longitude)) // Sets the new camera position
                 .zoom(12.5) // Sets the zoom
                 .tilt(20) // Set the camera tilt
                 .build(); // Creates a CameraPosition from the builder
@@ -311,27 +331,48 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void showCurrentLocation(MapboxMap mMap) {
-        currentLocation = getMyLocation();
-        currentPoint = Point.fromLngLat(currentLocation.getLongitude(), currentLocation.getLatitude());
-        currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        //add marker
-        Icon icon = IconFactory.getInstance(ActivityMap.this).fromResource(R.drawable.scooter_front_view);
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
-                .title("Bạn đang ở đây"))
-                .setIcon(icon);
+        if (currentLocation!=null){
+            currentPoint = Point.fromLngLat(currentLocation.getLongitude(), currentLocation.getLatitude());
+            currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            //add marker
+            Icon icon = IconFactory.getInstance(ActivityMap.this).fromResource(R.drawable.scooter_front_view);
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                    .title("Bạn đang ở đây"))
+                    .setIcon(icon);
 
-        CameraPosition position = new CameraPosition.Builder()
-                .target(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())) // Sets the new camera position
-                .zoom(12) // Sets the zoom
-                .tilt(20) // Set the camera tilt
-                .build(); // Creates a CameraPosition from the builder
-        mMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(position), 1500);
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())) // Sets the new camera position
+                    .zoom(12) // Sets the zoom
+                    .tilt(20) // Set the camera tilt
+                    .build(); // Creates a CameraPosition from the builder
+            mMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(position), 1500);
+            return;
+        }
+
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     private Location getMyLocation() {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3, 5, this);
+        }
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -383,7 +424,11 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onResume() {
         super.onResume();
+        Toast.makeText(ActivityMap.this,"abcdđ",Toast.LENGTH_LONG).show();
         mapView.onResume();
+        mapView.getMapAsync(this);
+        //showCurrentLocation(mMap);
+
     }
 
     @Override
@@ -422,4 +467,39 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         mapView.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        currentLocation=location;
+        currentPoint = Point.fromLngLat(currentLocation.getLongitude(), currentLocation.getLatitude());
+        currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        //add marker
+        Icon icon = IconFactory.getInstance(ActivityMap.this).fromResource(R.drawable.scooter_front_view);
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                .title("Bạn đang ở đây"))
+                .setIcon(icon);
+
+        CameraPosition position = new CameraPosition.Builder()
+                .target(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())) // Sets the new camera position
+                .zoom(12) // Sets the zoom
+                .tilt(20) // Set the camera tilt
+                .build(); // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(position), 1500);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
