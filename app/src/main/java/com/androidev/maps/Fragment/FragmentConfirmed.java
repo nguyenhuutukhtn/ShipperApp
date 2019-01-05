@@ -1,6 +1,7 @@
 package com.androidev.maps.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.androidev.maps.Activity.ActivityMap;
 import com.androidev.maps.Adapter.AdapterMainShipper;
 import com.androidev.maps.Adapter.AdapterOrderDetail;
 import com.androidev.maps.ApiHelper.ApiCaller;
@@ -211,9 +213,8 @@ public class FragmentConfirmed extends Fragment {
         imageViewHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragmentMap=new FragmentMap();
-                FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.container_fragment_confirmed,fragmentMap).addToBackStack("Fragment confirm").commit();
+                Intent intent=new Intent(getActivity(),ActivityMap.class);
+                startActivity(intent);
             }
         });
         buttonComplete.setOnClickListener(new View.OnClickListener() {

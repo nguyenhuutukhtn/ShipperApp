@@ -53,10 +53,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.mapbox.core.constants.Constants.PRECISION_6;
 
 public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "abc";
+    public static final int RequestCode = 20;
     private MapView mapView;
     private MapboxMap mMap;
     private DirectionsRoute optimizedRoute;
@@ -70,7 +72,6 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private Point currentPoint;
     private LatLng searchedLatLng;
     private LatLng currentLatLng;
-    private Spinner spinnerChooseLocation;
     private TextView textViewPlaceInfo;
     private ImageView imageViewCloseLayoutPlaceInfo;
     private ImageView imageViewSatillineMap;
@@ -78,6 +79,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private Location currentLocation;
     private ImageButton buttonShowDirection;
     private ImageButton buttonBack;
+    private ImageButton buttonGPS;
     private static final String FIRST = "first";
     private static final String ANY = "any";
     private static final String TEAL_COLOR = "#23D2BE";
@@ -102,13 +104,42 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         handleSearchEvent();
         handleButtonShowDirectionClickEvent(mMap);
         handleSatellineImage(mMap);
+        handleGPSbutton();
+        handleSatellineImage(mMap);
         handleBackButton();
+    }
+
+    private void handleGPSbutton() {
+        buttonGPS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // showCurrentLocation(mMap);
+                getPermissionLocation();
+            }
+        });
+    }
+    private void getPermissionLocation() {
+        if (ContextCompat.checkSelfPermission(ActivityMap.this,
+                ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(ActivityMap.this,new String []{ACCESS_FINE_LOCATION},RequestCode);
+        }
     }
 
     private void handleSatellineImage(MapboxMap mMap) {
         imageViewSatillineMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mapStyle.equals("NORMAL")){
+                    mMap.setStyleUrl(Style.SATELLITE);
+                    imageViewSatillineMap.setImageResource(R.drawable.normal_map);
+                    mapStyle="SATELLINE";
+                }
+                else {
+                    mMap.setStyle(Style.MAPBOX_STREETS);
+                    imageViewSatillineMap.setImageResource(R.drawable.satelline_map);
+                    mapStyle="NORMAL";
+                }
                 mMap.setStyleUrl(Style.SATELLITE);
             }
         });
@@ -330,11 +361,13 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         imageViewCloseLayoutPlaceInfo=findViewById(R.id.img_close_layout_place_info_fragment_map);
         buttonShowDirection=findViewById(R.id.btn_show_direction_fragment_map);
         buttonBack=findViewById(R.id.buttonBack_fragment_map);
-        spinnerChooseLocation=findViewById(R.id.spinner_choose_location_fragment_map);
         imageViewSatillineMap=findViewById(R.id.img_satilline_map);
+        buttonGPS=findViewById(R.id.gps_fixed_indicator);
     }
     private void setData() {
         stops=new ArrayList<>();
+        mapStyle="NORMAL";
+        imageViewSatillineMap=findViewById(R.id.img_satilline_map);
     }
 
     private void handleBackButton() {

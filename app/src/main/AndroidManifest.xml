@@ -27,6 +27,8 @@
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".Activity.MainShipperActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".Activity.ActivityMap"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
