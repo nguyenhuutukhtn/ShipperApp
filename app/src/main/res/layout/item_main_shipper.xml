@@ -19,6 +19,7 @@
             android:src="@drawable/store"
             android:scaleType="fitCenter"
             android:padding="10dp"
+            android:layout_gravity="center_vertical"
             android:adjustViewBounds="true"
             android:cropToPadding="true"/>
         <TextView
@@ -129,4 +130,8 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000"/>
 </LinearLayout>
