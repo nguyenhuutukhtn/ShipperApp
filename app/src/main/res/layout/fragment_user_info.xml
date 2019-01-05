@@ -74,31 +74,6 @@
             tools:ignore="InvalidId" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
-        android:weightSum="100"
-        android:background="#ffffff">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="40"
-            android:text="Email"
-            android:gravity="left|center"
-            android:textSize="18sp"
-            android:paddingLeft="6dp"
-            android:textColor="#33332e"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="60"
-            android:paddingLeft="6dp"
-            android:textColor="#63635e"
-            android:text="clgt@gmail.com"
-            android:textSize="17sp"
-            android:gravity="center|left" />
-    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
@@ -157,5 +132,5 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#ffffff"
-        android:layout_weight="25"></View>
+        android:layout_weight="49"></View>
 </LinearLayout>

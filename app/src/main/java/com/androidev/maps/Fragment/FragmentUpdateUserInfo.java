@@ -131,6 +131,7 @@ public class FragmentUpdateUserInfo extends Fragment {
         editor.putString("avatar",updateUserInfoResponse.getAvatar());
         editor.putString("username",updateUserInfoResponse.getUsername());
         editor.putString("Phone number",updateUserInfoResponse.getPhone());
+        editor.commit();
     }
 
     private void handleBackButtonClickEvent(View view) {
