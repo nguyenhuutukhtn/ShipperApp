@@ -144,7 +144,7 @@ public class FragmentUpdateUserInfo extends Fragment {
     }
 
     private void SetInfo() {
-        txtHeader.setText("Nguyen Huu Tu");
+        txtHeader.setText(fullName);
         Glide.with(getContext()).load(linkAvatar).into(imageViewAvatar);
         editTextUserName.setText(userName);
         editTextFullName.setText(fullName);
