@@ -185,6 +185,16 @@ public class MainShipperActivity extends AppCompatActivity {
             @Override
             public void onSucess(String response) {
                 FragmentConfirmed.confirmed = true;
+                SharedPreferences.Editor editor = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE).edit();
+                editor.putString("Store name", listOrder.get(position).getStore_name());
+                editor.putString("Store address", listOrder.get(position).getFrom());
+                editor.putString("Customer name", listOrder.get(position).getCustomer_name());
+                editor.putString("Customer address", listOrder.get(position).getTo());
+                editor.putInt("Order id", listOrder.get(position).getOrder_id());
+                FragmentConfirmed.confirmed=true;
+                editor.putBoolean("Confirmed", true);
+                editor.putInt("Position",position);
+                editor.commit();
                 MainShipperActivity.listOrder.remove(position);
                 MainShipperActivity.adapter.notifyDataSetChanged();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -269,15 +279,7 @@ public class MainShipperActivity extends AppCompatActivity {
                     bundle.putString("Customer address", listOrder.get(position).getTo());
                     bundle.putInt("Position",position);
                     bundle.putInt("Shipper id",shipperID);
-                    SharedPreferences.Editor editor = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE).edit();
-                    editor.putString("Store name", listOrder.get(position).getStore_name());
-                    editor.putString("Store address", listOrder.get(position).getFrom());
-                    editor.putString("Customer name", listOrder.get(position).getCustomer_name());
-                    editor.putString("Customer address", listOrder.get(position).getTo());
-                    editor.putInt("Order id", listOrder.get(position).getOrder_id());
-                    editor.putBoolean("Confirmed", FragmentConfirmed.confirmed);
-                    editor.putInt("Position",position);
-                    editor.commit();
+
                     fragmentConfirmed.setArguments(bundle);
 
                     sendUpdateToServer(fragmentConfirmed,listOrder.get(position).getOrder_id(), shipperID,position);

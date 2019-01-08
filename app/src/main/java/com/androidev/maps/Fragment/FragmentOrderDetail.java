@@ -283,6 +283,7 @@ public class FragmentOrderDetail extends Fragment {
                 editor.putString("Customer name",getArguments().get("Customer name").toString());
                 editor.putString("Customer address",getArguments().get("Customer address").toString());
                 editor.putInt("Order id",getArguments().getInt("Order id"));
+                FragmentConfirmed.confirmed=true;
                 editor.putBoolean("Confirmed",true);
                 editor.commit();
                 Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();

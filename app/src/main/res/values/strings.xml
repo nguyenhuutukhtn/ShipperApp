@@ -8,10 +8,10 @@
     <string name="information_update">Information update</string>
     <string name="log_out">Log out</string>
 
-    <string name="location_prompt">Xem vị trí</string>
+    <string name="location_prompt">Chọn vị trí</string>
     <string-array name="location_array">
-        <item>Cửa hàng</item>
-        <item>Nơi giao hàng</item>
+        <item>Vị trí cửa hàng</item>
+        <item>Vị trí giao hàng</item>
     </string-array>
 
     <!--<string name="default_avatar">https://firebasestorage.googleapis.com/v0/b/flashfood-ce894.appspot.com/o/profile_images%2Favatar.jpg?alt=media&token=cf8ec159-e88b-4faf-95e7-0120ac9eef1a&fbclid=IwAR1_eSK2EfgpPbfYs3I7H0gv5RycRp6EHyAz24IAdnA_G9RtDgHxCUmGKrQ</string>-->
