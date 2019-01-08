@@ -10,6 +10,7 @@
 
     <string name="location_prompt">Chọn vị trí</string>
     <string-array name="location_array">
+        <item>Tìm vị trí</item>
         <item>Vị trí cửa hàng</item>
         <item>Vị trí giao hàng</item>
     </string-array>

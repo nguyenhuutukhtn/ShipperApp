@@ -18,12 +18,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidev.maps.Fragment.FragmentConfirmed;
 import com.androidev.maps.R;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,6 +33,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.api.optimization.v1.MapboxOptimization;
@@ -40,6 +48,7 @@ import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
@@ -47,6 +56,10 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -61,7 +74,7 @@ import retrofit2.Response;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.mapbox.core.constants.Constants.PRECISION_6;
 
-public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback, LocationListener,PermissionsListener {
     private static final String TAG = "abc";
     public static final int RequestCode = 20;
     private MapView mapView;
@@ -69,6 +82,10 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private DirectionsRoute optimizedRoute;
     private MapboxOptimization optimizedClient;
     private Polyline optimizedPolyline;
+    private LocationEngine locationEngine;
+    private LocationEngineListener locationEngineListener;
+    private PermissionsManager permissionsManager;
+    private Location lastLocation;
     private List<Point> stops;
     private String searchedAddress;
     private String mapStyle;
@@ -85,6 +102,8 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private ImageButton buttonShowDirection;
     private ImageButton buttonBack;
     private ImageButton buttonGPS;
+    private Spinner spinnerLocation;
+    private Marker currentMarker;
     private FusedLocationProviderClient mFusedLocationClient;
     LocationManager locationManager;
     private static final String FIRST = "first";
@@ -100,14 +119,15 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         mapping();
         setData();
         // Setup the MapView
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        //Jump to onMapReady
     }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         mMap = mapboxMap;
+        //enableLocationEngine();
         showCurrentLocation(mMap);
         handleSearchEvent();
         handleButtonShowDirectionClickEvent(mMap);
@@ -115,6 +135,99 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         handleGPSbutton();
         handleSatellineImage(mMap);
         handleBackButton();
+        handleSpinnerLocationSelected();
+    }
+
+    private void enableLocationEngine() {
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            listenLocationChange();
+        } else {
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(this);
+        }
+    }
+
+    private void listenLocationChange() {
+        locationEngine=new LocationEngineProvider(ActivityMap.this).obtainBestLocationEngineAvailable();
+        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+        locationEngine.setInterval(0);
+        locationEngine.setFastestInterval(1000);
+        if (ContextCompat.checkSelfPermission(ActivityMap.this,
+                ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(ActivityMap.this, new String[]{ACCESS_FINE_LOCATION}, 1);
+        }
+        lastLocation = locationEngine.getLastLocation();
+        if (lastLocation != null) {
+            currentLocation=lastLocation;
+            showLocationWithPoint(Point.fromLngLat(currentLocation.getLongitude(),currentLocation.getLatitude()),mMap);
+        }
+
+
+        locationEngine.addLocationEngineListener(new LocationEngineListener() {
+            @Override
+            public void onConnected() {
+                if (ContextCompat.checkSelfPermission(ActivityMap.this,
+                        ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                } else {
+                    ActivityCompat.requestPermissions(ActivityMap.this, new String[]{ACCESS_FINE_LOCATION}, 1);
+                }
+                locationEngine.requestLocationUpdates();
+            }
+
+            @Override
+            public void onLocationChanged(Location location) {
+                lastLocation=location;
+                currentLocation=location;
+                showLocationWithPoint(Point.fromLngLat(location.getLongitude(),location.getLatitude()),mMap);
+            }
+        });
+
+        locationEngine.activate();
+    }
+
+    private void addMarkerToCurrentLocation(Location lastLocation) {
+        if (currentMarker!=null){
+        }
+        Icon icon = IconFactory.getInstance(ActivityMap.this).fromResource(R.drawable.scooter_front_view);
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                .title("Bạn đang ở đây"))
+                .setIcon(icon);
+        currentLatLng=new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+    }
+
+    private void handleSpinnerLocationSelected() {
+        spinnerLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position==1){
+                    showLocationWithPoint(FragmentConfirmed.originPoint,mMap);
+                    searchedLatLng=new LatLng(FragmentConfirmed.originPoint.latitude(),FragmentConfirmed.originPoint.longitude());
+                } else if(position==2){
+                    showLocationWithPoint(FragmentConfirmed.destinationPoint,mMap);
+                    searchedLatLng=new LatLng(FragmentConfirmed.destinationPoint.latitude(),FragmentConfirmed.destinationPoint.longitude());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void showLocationWithPoint(Point point, MapboxMap mMap) {
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(point.latitude(),point.longitude()))
+                .title("Vị trí cần tìm"));
+        CameraPosition position = new CameraPosition.Builder()
+                .target(new LatLng(point.latitude(),point.longitude())) // Sets the new camera position
+                .zoom(12.5) // Sets the zoom
+                .tilt(20) // Set the camera tilt
+                .build(); // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(position), 2000);
     }
 
 
@@ -177,6 +290,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
                             .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
                             .title("Bạn đang ở đây"))
                             .setIcon(icon);
+                    currentLatLng=new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
                     DrawRouteBetween2Point(currentLatLng, searchedLatLng);
                 }
             }
@@ -399,6 +513,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         buttonBack=findViewById(R.id.buttonBack_fragment_map);
         imageViewSatillineMap=findViewById(R.id.img_satilline_map);
         buttonGPS=findViewById(R.id.gps_fixed_indicator);
+        spinnerLocation=findViewById(R.id.spinner_location_activity_map);
     }
     private void setData() {
         stops=new ArrayList<>();
@@ -494,4 +609,20 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     public void onProviderDisabled(String provider) {
 
     }
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocationEngine();
+        } else {
+            Toast.makeText(ActivityMap.this, "Không được phép", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
 }
