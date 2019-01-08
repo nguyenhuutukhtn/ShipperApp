@@ -60,7 +60,9 @@ public class AdapterOrderDetail extends RecyclerView.Adapter<AdapterOrderDetail.
         textViewProductPrice.setText("Giá:" +order.getPrice()+"đ");
         textViewProductNumber.setText("Số lượng: "+order.getAmount());
         Glide.with(imageViewAvatar.getContext()).load(order.getThumbnail().toString()).into(imageViewAvatar);
-        //textViewProductTotal.setText((order.getAmount()*Integer.parseInt(order.getPrice())));
+        int total=order.getAmount()*(Integer.parseInt(order.getPrice()));
+
+        textViewProductTotal.setText("Tổng: "+total+"đ");
 
     }
 
